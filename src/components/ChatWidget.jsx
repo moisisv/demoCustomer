@@ -35,7 +35,8 @@ const ChatWidget = () => {
                 icon: 'close',
                 onClick: () => setIsOpen(false),
             },
-        }, startScreen: {
+        },
+        startScreen: {
             greeting: "Hi! Ask me something 😊"
         },
     });
