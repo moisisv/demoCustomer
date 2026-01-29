@@ -1,15 +1,43 @@
 import React, { useState } from 'react';
-import { MessageCircle, X } from 'lucide-react';
+import { MessageCircle } from 'lucide-react';
 import { ChatKit, useChatKit } from '@openai/chatkit-react';
 
 const ChatWidget = () => {
     const [isOpen, setIsOpen] = useState(false);
 
-    // Placeholder for OpenAI ChatKit Workflow ID
-    const WORKFLOW_ID = 'YOUR_WORKFLOW_ID_HERE';
+    const WORKFLOW_ID = import.meta.env.VITE_OPENAI_WORKFLOW_ID;
+    const userId = 'anonymous';
 
-    const { control } = useChatKit({
-        workflowId: WORKFLOW_ID,
+    const { control, ref } = useChatKit({
+        api: {
+            async getClientSecret(currentClientSecret) {
+                const apiKey = import.meta.env.VITE_OPENAI_API_SECRET_KEY;
+                const res = await fetch('https://api.openai.com/v1/chatkit/sessions', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${apiKey}`,
+                        'Content-Type': 'application/json',
+                        'OpenAI-Beta': 'chatkit_beta=v1',
+                    },
+                    body: JSON.stringify({
+                        workflow: { id: WORKFLOW_ID },
+                        user: userId,
+                    }),
+                });
+                const data = await res.json();
+                return data.client_secret;
+            },
+        },
+        theme: { colorScheme: 'dark' },
+        header: {
+            // Add a right action using ChatKit header options
+            rightAction: {
+                icon: 'close',
+                onClick: () => setIsOpen(false),
+            },
+        }, startScreen: {
+            greeting: "Hi! Ask me something 😊"
+        },
     });
 
     const toggleChat = () => {
@@ -25,7 +53,6 @@ const ChatWidget = () => {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'flex-end',
-            gap: '1rem'
         }}>
             {isOpen && (
                 <div className="chat-window-wrapper glass" style={{
@@ -35,9 +62,6 @@ const ChatWidget = () => {
                     overflow: 'hidden',
                     boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
                     border: '1px solid rgba(255,255,255,0.1)',
-                    marginBottom: '0.5rem',
-                    background: 'rgba(15, 23, 42, 0.8)',
-                    backdropFilter: 'blur(12px)',
                 }}>
                     <ChatKit
                         control={control}
@@ -45,9 +69,13 @@ const ChatWidget = () => {
                     />
                 </div>
             )}
+
             <button
                 onClick={toggleChat}
                 style={{
+                    position: 'absolute',
+                    bottom: 0,
+                    right: 0,
                     width: '60px',
                     height: '60px',
                     borderRadius: '50%',
@@ -59,16 +87,17 @@ const ChatWidget = () => {
                     boxShadow: '0 10px 25px rgba(0,0,0,0.3)',
                     border: 'none',
                     cursor: 'pointer',
-                    transition: 'var(--transition)',
-                    transform: isOpen ? 'rotate(90deg)' : 'none'
+                    transition: 'all 0.3s ease',
+                    opacity: isOpen ? 0 : 1,
+                    pointerEvents: isOpen ? 'none' : 'auto',
+                    transform: isOpen ? 'scale(0.8)' : 'scale(1)',
                 }}
-                aria-label="Toggle Chat"
+                aria-label="Open Chat"
             >
-                {isOpen ? <X size={28} /> : <MessageCircle size={28} />}
+                <MessageCircle size={28} />
             </button>
         </div>
     );
 };
 
 export default ChatWidget;
-
