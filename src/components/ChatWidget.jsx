@@ -6,12 +6,13 @@ const ChatWidget = () => {
     const [isOpen, setIsOpen] = useState(false);
 
     const WORKFLOW_ID = import.meta.env.VITE_OPENAI_WORKFLOW_ID;
+    const openAIkey = import.meta.env.VITE_OPENAI_API_SECRET_KEY;
     const userId = 'anonymous';
 
     const { control, ref } = useChatKit({
         api: {
             async getClientSecret(currentClientSecret) {
-                const apiKey = import.meta.env.VITE_OPENAI_API_SECRET_KEY;
+                const apiKey = openAIkey;
                 const res = await fetch('https://api.openai.com/v1/chatkit/sessions', {
                     method: 'POST',
                     headers: {
@@ -65,6 +66,7 @@ const ChatWidget = () => {
                     border: '1px solid rgba(255,255,255,0.1)',
                 }}>
                     <ChatKit
+                        ref={ref}
                         control={control}
                         style={{ width: '100%', height: '100%' }}
                     />
