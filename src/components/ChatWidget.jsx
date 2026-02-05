@@ -4,6 +4,8 @@ import { ChatKit, useChatKit } from '@openai/chatkit-react';
 
 const ChatWidget = () => {
     const [isOpen, setIsOpen] = useState(false);
+    const [isHovered, setIsHovered] = useState(false);
+
 
     const WORKFLOW_ID = import.meta.env.VITE_OPENAI_WORKFLOW_ID;
     const openAIkey = import.meta.env.VITE_OPENAI_API_SECRET_KEY;
@@ -75,6 +77,8 @@ const ChatWidget = () => {
 
             <button
                 onClick={toggleChat}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
                 style={{
                     position: 'absolute',
                     bottom: 0,
@@ -90,10 +94,12 @@ const ChatWidget = () => {
                     boxShadow: '0 10px 25px rgba(0,0,0,0.3)',
                     border: 'none',
                     cursor: 'pointer',
-                    transition: 'all 0.3s ease',
+                    transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
                     opacity: isOpen ? 0 : 1,
                     pointerEvents: isOpen ? 'none' : 'auto',
-                    transform: isOpen ? 'scale(0.8)' : 'scale(1)',
+                    transform: isOpen
+                        ? 'scale(0.8)'
+                        : isHovered ? 'scale(1.1)' : 'scale(1)',
                 }}
                 aria-label="Open Chat"
             >
