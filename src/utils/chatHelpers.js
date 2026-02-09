@@ -33,7 +33,7 @@ export function mapChatkitLogsToAnosys(input) {
         out.event_id = input.openai.workflow_id;
     }
 
-    let cvsIndex = 3;
+    let cvsIndex = 10;
     let cvnIndex = 3;
 
     function setCVS(value) {
@@ -47,8 +47,8 @@ export function mapChatkitLogsToAnosys(input) {
     }
 
     // --- Session / user identifiers ---
-    setCVS(input.chatkit?.session_id); //in theory will be always on cvs3 and used to link with tracker records.
-    setCVS(input.chatkit?.thread_id);
+    out.cvs3 = String(input.chatkit?.session_id);
+    out.cvs4 = String(input.chatkit?.thread_id);
 
     //other posible fields
     // setCVS(input.app?.user_id);
